@@ -4,7 +4,6 @@ import Notiflix from 'notiflix';
 import { Loading } from 'notiflix/build/notiflix-loading-aio';
 
 import axios from 'axios';
-// import { searchImages } from 'pixabay-api';
 import NewApiService from './api-service';
 import createMarkup from './createMarkup';
 
@@ -13,8 +12,6 @@ const lightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 
-let queryToFetch = '';
-let pageToFetch;
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -27,7 +24,7 @@ const {searchForm, hitsContainer, loadMoreBtn, target} = refs;
 
 const newsApiService = new NewApiService();
 
-let currentPage = 1;
+let currentPage = 499;
 let options = {
   root: null,
   rootMargin: "300px",
@@ -35,22 +32,25 @@ let options = {
 };
 
 let observer = new IntersectionObserver(onLoad, options);
+
 function onLoad(entries, observer) {
-  // console.log(entries);
   entries.forEach((entry) => {
-    if (entry.isIntersecting) {
+    // console.log(entry);
+    if(entry.isIntersecting){
       currentPage += 1;
-      createMarkup(currentPage)
-        .then((data) => {
-          list.insertAdjacentHTML("beforeend", createMarkup(data.results));
-          if (data.page === data.total_pages) {
-            observer.unobserve(target);
-          }
-        })
-        .catch((err) => console.log(err));
+      onLoadMore(currentPage)
+      .then((hits) => {
+        hitsContainer.insertAdjacentHTML('beforeend', createMarkup(hits));
+        if(data.page === data.totalHits){
+          observer.unobserve(target);
+        }
+
+      })
+      .catch((err) => console.log(err));
     }
-  });
+  })
 }
+
 
 searchForm.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', onLoadMore);
@@ -84,7 +84,11 @@ function clearContainer() {
 
 const fetchHits = async (query, page) => {
   try {
-    const data = await fetchHits(query, page);
+    Loading.circle('Loading', {
+      svgColor: '#2596be',
+    });
+
+    const data = await fetchHits(per_page, page);
     Loading.remove();
     if (!data.hits.length) {
       Notiflix.Notify.failure(
@@ -93,7 +97,7 @@ const fetchHits = async (query, page) => {
       return;
     }
     renderImages(data);
-    
+
     lightbox.refresh();
 
     if (page === 1) {
