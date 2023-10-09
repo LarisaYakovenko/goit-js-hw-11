@@ -1,5 +1,5 @@
-import {refs} from './refs';
-// const {gallery} = refs;
+
+
 
 export default function createMarkup(hits){
   return hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => `

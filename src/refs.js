@@ -5,4 +5,3 @@ export const refs = {
     loadMoreBtn: document.querySelector('.load-more'),
     target: document.querySelector('.js-guard'),
   }
-  // const {searchForm, hitsContainer, loadMoreBtn, target} = refs;
