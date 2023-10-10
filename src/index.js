@@ -52,6 +52,7 @@ searchForm.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', onLoadMore);
 
 
+
 function onSearch (e) {
   e.preventDefault();
 
@@ -60,7 +61,8 @@ function onSearch (e) {
   newsApiService.resetPage()
   newsApiService.fetchHits()
   .then(appendHitsMarkup)
-  .catch((err) => console.log(err));
+  searchForm.reset()
+  .catch((err) => console.log(err))
 }
 
 function onLoadMore () {
@@ -73,7 +75,7 @@ function appendHitsMarkup(hits) {
   hitsContainer.insertAdjacentHTML('beforeend', createMarkup(hits));
   observer.observe(target);
   lightbox.refresh();
-  Notiflix.Notify.success(`We found ${hits.total} images.`);
+  // Notiflix.Notify.success(`We found ${hits.total} images.`);
 }
 
 function clearContainer() {
