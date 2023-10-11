@@ -5,29 +5,43 @@ const API_KEY = "39853966-e469fabc3a3d91d6ce6cd4aef";
 export default class NewApiService {
   constructor() {
     this.searchQuery = '';
-    this.page = 1;
+    this.page = 498;
 
   }
 
   async fetchHits() {
-    // console.log(this);
-    const params = new URLSearchParams({
-      key: API_KEY,
-      q: this.searchQuery,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: 'true',
-      per_page: 40,
-      page: this.page,
-    })
 
-    return await fetch(`${BASE_URL}?key=${API_KEY}&${params}`)
-    .then(response => response.json())
-    .then(({hits}) => {
-      this.incrementPage();
-      return hits;
-    });
-  }
+      const params = new URLSearchParams({
+        key: API_KEY,
+        q: this.searchQuery,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: 'true',
+        per_page: 40,
+        page: this.page,
+      })
+
+      try {
+        const response = await fetch(`${BASE_URL}?key=${API_KEY}&${params}`);
+        if (!response.ok) {
+          throw new Error(response.statusText)
+        }
+        const data = await response.json();
+        this.incrementPage();
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+
+      // return fetch(`${BASE_URL}?key=${API_KEY}&${params}`)
+      // .then(response => response.json())
+      // .then((data) => {
+      //   this.incrementPage();
+      //   return data;
+      // });
+    }
+
+
 
   incrementPage() {
     this.page += 1;

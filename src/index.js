@@ -33,12 +33,14 @@ let observer = new IntersectionObserver(onLoad, options);
 
 
 function onLoad(entries, observer) {
+  // console.log(entries)
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       newsApiService.fetchHits()
       .then((data) => {
-        appendHitsMarkup(data);
-        if (data.page === data.total_pages) {
+        appendHitsMarkup(data.hits);
+        currentPage+=1;
+        if (currentPage * 40 >= data.totalHits) {
           observer.unobserve(target);
         }
       })
@@ -60,8 +62,10 @@ function onSearch (e) {
   newsApiService.query = e.currentTarget.searchQuery.value.trim().toLowerCase();
   newsApiService.resetPage()
   newsApiService.fetchHits()
-  .then(appendHitsMarkup)
-  searchForm.reset()
+  .then((data) => {
+    appendHitsMarkup(data.hits);
+    Notiflix.Notify.success(`We found ${data.totalHits} images.`);
+  })
   .catch((err) => console.log(err))
 }
 
@@ -75,7 +79,7 @@ function appendHitsMarkup(hits) {
   hitsContainer.insertAdjacentHTML('beforeend', createMarkup(hits));
   observer.observe(target);
   lightbox.refresh();
-  // Notiflix.Notify.success(`We found ${hits.total} images.`);
+  searchForm.reset()
 }
 
 function clearContainer() {
